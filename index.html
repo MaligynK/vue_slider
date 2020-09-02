@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+    <link rel="stylesheet" href="style.css">
+
+    <script src="node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="node_modules/vue/dist/vue.js"></script>
+
+
+</head>
+<body>
+
+<div id='app'>
+
+    <button @click="slider_list = slider_list2">Вставить другие данные в первый слайдер</button>
+
+    <hr>
+
+    <menu-slider v-bind:list="slider_list" v-bind:cols="showed_sliders"></menu-slider>
+
+    <hr>
+
+    <menu-slider v-bind:list="slider_list2" v-bind:cols="2"></menu-slider>
+
+</div>
+
+<script>
+
+    const slider = {
+        inheritAttrs: false,
+        props: {
+            // количество слайдов на экране
+            cols: Number,
+            // Список изображений
+            list: Array
+        },
+        data: function () {
+            return {
+                // Всего слайдов
+                all_count: 0,
+                // Номер активного слайда
+                slider_index: 1,
+                // Шаг одного слайда = его длина
+                slider_offset_step: 0,
+                // Отступ тела со слайдами в контейнере
+                slider_offset_left: 0
+            }
+        },
+        methods: {
+            // Иницилизация слайдера
+            init_slider: function () {
+                // Получаем элементы сладера и его слайдов
+                const $slider_body = $(this.$el);
+                const $slidies = $(this.$refs.slide);
+                // Высчитываем длину одного слайда и сохраняем для перелистывания
+                this.slider_offset_step = $slider_body.width() / this.cols;
+                $slidies.css('min-width', this.slider_offset_step + 'px');
+                // Общее количество слайдов для стопов
+                this.all_count = this.list.length;
+            },
+            // Открыть слайд по номеру
+            open_slide: function (id) {
+                if ((id + this.cols - 1) > this.all_count) {
+                    this.slider_index = 1;
+                } else if (id <= 0) {
+                    this.slider_index = this.all_count - this.cols + 1;
+                } else {
+                    this.slider_index = id;
+                }
+                this.slider_offset_left = -(this.slider_index * this.slider_offset_step - this.slider_offset_step);
+            },
+
+            // Следующий слайд
+            next_slide: function () {
+                this.slider_index += 1;
+                this.open_slide(this.slider_index);
+            },
+
+            // Предыдущий слайд
+            prev_slide: function () {
+                this.slider_index -= 1;
+                this.open_slide(this.slider_index);
+            }
+        },
+        updated(){
+            if (this.all_count !== this.list.length) {
+                // обновление списка, нужно вернуть к первому элементу на случай,
+                // если в новом списке меньше элементов
+                this.init_slider();
+                this.open_slide(1);
+            }
+        },
+        mounted () {
+            const view = this;
+            view.init_slider();
+            // Перенастройка слайдера при ресайзе окна
+            window.addEventListener('resize', function(){
+                view.init_slider();
+                view.open_slide(this.slider_index);
+            })
+        },
+        template: '<div class="slider">' +
+        '<button v-on:click="prev_slide">Prev</button>' +
+        '<button v-on:click="next_slide">Next</button>' +
+        '<div class="slider__body" v-bind:style="{left: slider_offset_left + \'px\'}">' +
+        '<div v-for="slide in list" >' +
+        '<div class="slider__slide" ref="slide" v-bind:style=\'"background-image: url(" + slide.img + ")"\'>' +
+        '<p>{{ slide.text }}</p>' +
+        '</div>' +
+        '</div>' +
+        '</div>' +
+        '</div>'
+    };
+
+    new Vue({
+        el: '#app',
+        components: {
+            'menu-slider': slider
+        },
+        data () {
+            return {
+                showed_sliders: 3,
+                // Список изображений
+                slider_list: [
+                    {
+                        img: 'https://sun9-26.userapi.com/FZL4R3NrFYkJ-hP49jJp3Xt7myj3bvw90KIcpg/-GcxmD1A_Ak.jpg',
+                        text: 'slide 1'
+                    },
+                    {
+                        img: 'https://sun9-64.userapi.com/c622229/v622229727/d336/poJcXi90jk4.jpg',
+                        text: 'slide 2'
+                    },
+                    {
+                        img: 'https://sun9-26.userapi.com/FZL4R3NrFYkJ-hP49jJp3Xt7myj3bvw90KIcpg/-GcxmD1A_Ak.jpg',
+                        text: 'slide 3'
+                    },
+                    {
+                        img: 'https://sun9-64.userapi.com/c622229/v622229727/d336/poJcXi90jk4.jpg',
+                        text: 'slide 4'
+                    },
+                    {
+                        img: 'https://sun9-26.userapi.com/FZL4R3NrFYkJ-hP49jJp3Xt7myj3bvw90KIcpg/-GcxmD1A_Ak.jpg',
+                        text: 'slide 5'
+                    },
+                    {
+                        img: 'https://sun9-64.userapi.com/c622229/v622229727/d336/poJcXi90jk4.jpg',
+                        text: 'slide 6'
+                    }
+                ],
+                slider_list2: [
+                    {
+                        img: 'https://sun9-64.userapi.com/c622229/v622229727/d336/poJcXi90jk4.jpg',
+                        text: 'slide 01'
+                    },
+                    {
+                        img: 'https://sun9-26.userapi.com/FZL4R3NrFYkJ-hP49jJp3Xt7myj3bvw90KIcpg/-GcxmD1A_Ak.jpg',
+                        text: 'slide 02'
+                    },
+                    {
+                        img: 'https://sun9-64.userapi.com/c622229/v622229727/d336/poJcXi90jk4.jpg',
+                        text: 'slide 03'
+                    },
+                    {
+                        img: 'https://sun9-26.userapi.com/FZL4R3NrFYkJ-hP49jJp3Xt7myj3bvw90KIcpg/-GcxmD1A_Ak.jpg',
+                        text: 'slide 04'
+                    }
+                ]
+            }
+        }
+    });
+
+</script>
+
+</body>

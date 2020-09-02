@@ -1,0 +1,26 @@
+$slider-height: 400px;
+$slide-width: 100%;
+
+.slider {
+  width: 100%;
+  height: $slider-height;
+  position: relative;
+  overflow: hidden;
+
+  &__body {
+    min-width: auto;
+    height: $slider-height;
+    display: flex;
+    position: relative;
+    align-items: stretch;
+    transition: all .5s ease;
+  }
+
+  &__slide {
+    min-width: $slide-width;
+    height: $slider-height;
+    background-size: cover;
+    background-position: center;
+    flex: 1 100%;
+  }
+}
